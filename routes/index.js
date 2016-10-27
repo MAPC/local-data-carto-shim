@@ -64,6 +64,7 @@ function pingExport(type, url, res) {
       // console.log("worked!:", body.href);
       var file = JSON.parse(body).href;
       request(file, function(err, resp, body) {
+        res.set('Content-Type', 'application/octet-stream');
         res.send(body);
       })
       

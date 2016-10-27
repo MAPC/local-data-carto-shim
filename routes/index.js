@@ -10,17 +10,17 @@ router.get('/:surveyId', function(req, res, next) {
   var url = "https://app.localdata.com/api/slugs/" + req.params.surveyId;
   request(url, function(err, resp, body) {
     var surveyIdUnique = JSON.parse(body).survey;
-    getShapefile(surveyIdUnique, res);
+    getCSV(surveyIdUnique, res);
     // res.send("Ntohing");
   });    
 });
 
 module.exports = router;
 
-function getShapefile(id, res) {
-  var url = "http://app.localdata.com/api/surveys/" + id + '/responses.zip';
+function getCSV(id, res) {
+  var url = "http://app.localdata.com/api/surveys/" + id + '/responses.csv';
   console.log(url);
-  pingExport('shapefile', url, res);
+  pingExport('csv', url, res);
   // util.track('survey.export.shapefile');
 }
 
@@ -63,7 +63,10 @@ function pingExport(type, url, res) {
       // window.location = data.href;
       // console.log("worked!:", body.href);
       var file = JSON.parse(body).href;
-      res.redirect(file);
+      request(file, function(err, resp, body) {
+        res.send(body);
+      })
+      
 
     });
   }

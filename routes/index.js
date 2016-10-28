@@ -1,6 +1,7 @@
 var express = require('express');
 var request = require('request');
 var _ = require('underscore');
+var fs = require('fs');
 
 var router = express.Router();
 var exportTimeout = 2 * 60 * 1000; // 2 minutes
@@ -9,18 +10,24 @@ var loading = {};
 router.get('/:surveyId', function(req, res, next) {
   var url = "https://app.localdata.com/api/slugs/" + req.params.surveyId;
   request(url, function(err, resp, body) {
-    var surveyIdUnique = JSON.parse(body).survey;
-    getCSV(surveyIdUnique, res);
+    console.log(resp.statusCode);
+    if (resp.statusCode == 200) {
+      var surveyIdUnique = JSON.parse(body).survey;
+      getShapefile(surveyIdUnique, res);      
+    } else {
+      res.send("error");
+    }
+
     // res.send("Ntohing");
   });    
 });
 
 module.exports = router;
 
-function getCSV(id, res) {
-  var url = "http://app.localdata.com/api/surveys/" + id + '/responses.csv';
+function getShapefile(id, res) {
+  var url = "http://app.localdata.com/api/surveys/" + id + '/responses.zip';
   console.log(url);
-  pingExport('csv', url, res);
+  pingExport('zip', url, res);
   // util.track('survey.export.shapefile');
 }
 
@@ -63,10 +70,11 @@ function pingExport(type, url, res) {
       // window.location = data.href;
       // console.log("worked!:", body.href);
       var file = JSON.parse(body).href;
-      request(file, function(err, resp, body) {
-        res.set('Content-Type', 'application/octet-stream');
-        res.send(body);
-      })
+      request(file)
+        .pipe(fs.createWriteStream('file.zip'))
+        .on('close', function() {
+          res.download('file.zip');
+        });
       
 
     });

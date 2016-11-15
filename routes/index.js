@@ -25,9 +25,9 @@ router.get('/:surveyId', function(req, res, next) {
 module.exports = router;
 
 function getShapefile(id, res) {
-  var url = "http://app.localdata.com/api/surveys/" + id + '/responses.zip';
+  var url = "http://app.localdata.com/api/surveys/" + id + '/responses.csv';
   console.log(url);
-  pingExport('zip', url, res);
+  pingExport('csv', url, res);
   // util.track('survey.export.shapefile');
 }
 
@@ -71,9 +71,9 @@ function pingExport(type, url, res) {
       // console.log("worked!:", body.href);
       var file = JSON.parse(body).href;
       request(file)
-        .pipe(fs.createWriteStream('file.zip'))
+        .pipe(fs.createWriteStream('file.csv'))
         .on('close', function() {
-          res.download('file.zip');
+          res.download('file.csv');
         });
       
 

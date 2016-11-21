@@ -69,12 +69,12 @@ function pingExport(type, url, res) {
       // self.render();
       // window.location = data.href;
       // console.log("worked!:", body.href);
+
       var file = JSON.parse(body).href;
-      request(file)
-        .pipe(fs.createWriteStream('file.csv'))
-        .on('close', function() {
-          res.download('file.csv');
-        });
+      request(file, function(err, resp, body) {
+        res.set('Content-Type', 'application/csv');
+        res.send(body);
+      })
       
 
     });

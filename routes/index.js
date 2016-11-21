@@ -72,7 +72,7 @@ function pingExport(type, url, res) {
 
       var file = JSON.parse(body).href;
       request(file, function(err, resp, body) {
-        res.set('Content-Type', 'application/csv');
+        res.set('Content-Type', 'text/csv');
         res.send(body);
       })
       
